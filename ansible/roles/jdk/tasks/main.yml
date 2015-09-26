@@ -1,0 +1,8 @@
+---
+- stat:
+    path=/usr/bin/javac
+  register: javac_stats
+
+- include: jdk.yml
+  become: yes
+  when: not javac_stats.stat.exists

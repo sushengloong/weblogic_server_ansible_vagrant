@@ -1,0 +1,96 @@
+---
+- name: Change random source of Java to workaround slowness with Weblogic
+  lineinfile:
+    dest="{{ java_security_path }}"
+    regexp="^securerandom.source=file:/dev/urandom$"
+    line="securerandom.source=file:/dev/./urandom"
+  become: yes
+
+- name: Check Weblogic Exists
+  stat:
+    path="{{ wls_home }}"
+  register: wls
+
+- name: Copy weblogic install file
+  copy:
+    src="{{ wls_installer_jar_filename }}"
+    dest="{{ ansible_env.HOME }}/{{ wls_installer_jar_filename }}"
+    owner="{{ wls_owner }}"
+    group="{{ wls_group }}"
+    mode=0644
+  when: not wls.stat.exists
+
+- name: weblogic install file
+  template:
+    src=install.file.j2
+    dest="{{ ansible_env.HOME }}/install.file"
+    owner="{{ wls_owner }}"
+    group="{{ wls_group }}"
+    mode=0644
+  when: not wls.stat.exists
+
+- name: weblogic install loc
+  template:
+    src=oraInst.loc.j2
+    dest="{{ ansible_env.HOME }}/oraInst.loc"
+    owner="{{ wls_owner }}"
+    group="{{ wls_group }}"
+    mode=0644
+  when: not wls.stat.exists
+
+- name: install weblogic
+  command: "{{ java_home }}/bin/java -jar {{ ansible_env.HOME }}/{{ wls_installer_jar_filename }} -silent -responseFile {{ ansible_env.HOME }}/install.file -invPtrLoc {{ ansible_env.HOME }}/oraInst.loc -jreLoc {{ java_home }}"
+  when: not wls.stat.exists
+
+- name: Clean up (weblogic install jar)
+  file:
+    path={{ ansible_env.HOME }}/{{ wls_installer_jar_filename }}
+    state=absent
+
+- name: Clean up (weblogic install file)
+  file:
+    path={{ ansible_env.HOME }}/install.file
+    state=absent
+
+- name: Clean up (weblogic install loc)
+  file:
+    path={{ ansible_env.HOME }}/oraInst.loc
+    state=absent
+
+- name: Check Domain Exists
+  stat:
+    path={{ wls_home }}/user_projects/domains/{{ wls_domain_name }}
+  register: dm
+
+- name: domain create python scripts
+  template:
+    src=create_wls_domain.py.j2
+    dest={{ ansible_env.HOME }}/create_wls_domain.py
+    owner={{ wls_owner }}
+    group={{ wls_group }}
+    mode=0644
+  when: not dm.stat.exists
+
+- name: domain create shell scripts
+  template:
+    src=create_wls_domain.sh.j2
+    dest={{ ansible_env.HOME }}/create_wls_domain.sh
+    owner={{ wls_owner }}
+    group={{ wls_group }}
+    mode=0755
+  when: not dm.stat.exists
+
+- name: domain creation
+  command: ./create_wls_domain.sh
+    chdir={{ ansible_env.HOME }}
+  when: not dm.stat.exists
+
+- name: Clean up (domain create python scripts)
+  file:
+    path={{ ansible_env.HOME }}/create_wls_domain.py
+    state=absent
+
+- name: Clean up (domain create shell scripts)
+  file:
+    path={{ ansible_env.HOME }}/create_wls_domain.sh
+    state=absent

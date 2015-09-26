@@ -1,0 +1,22 @@
+---
+- name: Copy files to tmp
+  copy:
+    src="{{ netcat_rpm_filename }}"
+    dest="{{ netcat_rpm_tmp_path }}"
+
+- name: Install some tools
+  yum:
+    name="{{ item }}"
+    state=present
+    update_cache=yes
+  with_items:
+    - curl
+    - wget
+    - "{{ netcat_rpm_tmp_path }}"
+  become: yes
+
+# FIXME - remove this rule after adding tasks for configuring iptables
+- name: Shutdown iptables
+  service:
+    name=iptables
+    state=stopped

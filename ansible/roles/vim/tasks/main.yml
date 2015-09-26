@@ -1,0 +1,8 @@
+---
+- stat:
+    path=/usr/bin/vim
+  register: vim_stats
+
+- include: vim.yml
+  become: yes
+  when: not vim_stats.stat.exists

@@ -1,0 +1,4 @@
+.DS_Store
+.vagrant
+ansible/roles/wls/files/fmw_12.1.3.0.0_wls.jar
+ansible/roles/jdk/files/jdk-8u60-linux-x64.rpm

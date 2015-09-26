@@ -1,0 +1,33 @@
+---
+- name: Install dependencies for compiling vim
+  yum:
+    name="{{ item }}"
+    state=present
+    update_cache=yes
+  with_items:
+    - "@Development tools"
+    - "ncurses"
+    - "ncurses-devel"
+    - "wget"
+    - "git"
+
+- name: Download vim source tarball
+  get_url:
+    url="{{ vim_source_tarball_download_url }}"
+    dest=/usr/local/src
+
+- name: Unarchive vim source tarball
+  unarchive:
+    src="{{ vim_source_build_dir }}/{{ vim_source_tarball_filename}}"
+    dest="{{ vim_source_build_dir }}"
+    copy=no
+
+- name: Configure vim
+  shell: ./configure --prefix=/usr --with-features=huge --enable-rubyinterp --enable-pythoninterp
+  args:
+    chdir: "{{ vim_source_build_dir }}/{{ vim_source_subdirectory }}"
+
+- name: Compile and install vim
+  shell: make && make install
+  args:
+    chdir:  "{{ vim_source_build_dir }}/{{ vim_source_subdirectory }}"

@@ -1,0 +1,3 @@
+---
+netcat_rpm_filename: netcat-0.7.1-1.i386.rpm
+netcat_rpm_tmp_path: "/tmp/{{ netcat_rpm_filename }}"

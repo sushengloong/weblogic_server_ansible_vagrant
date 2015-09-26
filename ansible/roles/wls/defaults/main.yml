@@ -1,0 +1,15 @@
+---
+java_version: jdk1.8.0_60
+java_home: "/usr/java/{{ java_version }}"
+java_security_path: "/usr/java/{{ java_version }}/jre/lib/security/java.security"
+config_jvm_args: "-Djava.security.egd=file:/dev/./urandom"
+wls_installer_jar_filename: fmw_12.1.3.0.0_wls.jar
+wls_home: "{{ ansible_env.HOME }}/weblogic12c"
+wls_inventory: "{{ ansible_env.HOME }}/weblogic_inventory"
+wls_owner: vagrant
+wls_group: vagrant
+wls_domain_name: mydomain
+wls_console_host: 0.0.0.0
+wls_console_port: 7001
+wls_user: weblogic
+wls_password: p@ssw0rd

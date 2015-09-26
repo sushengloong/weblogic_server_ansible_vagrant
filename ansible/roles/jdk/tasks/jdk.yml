@@ -1,0 +1,11 @@
+---
+- name: Copy JDK RPM
+  copy:
+    src="{{ jdk_rpm_filename }}"
+    dest=/tmp/
+
+- name: Install JDK RPM
+  yum:
+    name="/tmp/{{ jdk_rpm_filename }}"
+    state=present
+  become: yes
