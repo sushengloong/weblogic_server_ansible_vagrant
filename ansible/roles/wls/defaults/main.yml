@@ -9,6 +9,7 @@ wls_inventory: "{{ ansible_env.HOME }}/weblogic_inventory"
 wls_owner: vagrant
 wls_group: vagrant
 wls_domain_name: mydomain
+wls_domain_path: "{{ wls_home }}/user_projects/domains/{{ wls_domain_name }}"
 wls_console_host: 0.0.0.0
 wls_console_port: 7001
 wls_user: weblogic

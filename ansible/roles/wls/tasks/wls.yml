@@ -59,7 +59,7 @@
 
 - name: Check Domain Exists
   stat:
-    path={{ wls_home }}/user_projects/domains/{{ wls_domain_name }}
+    path="{{ wls_domain_path }}"
   register: dm
 
 - name: domain create python scripts
@@ -94,3 +94,10 @@
   file:
     path={{ ansible_env.HOME }}/create_wls_domain.sh
     state=absent
+
+- name: Ensure weblogic admin service is started
+  shell:
+    "running=$( netstat -ant | grep -cP '7001.+LISTEN' ) ;
+    [ $running -eq 0 ] && nohup {{ wls_domain_path }}/startWebLogic.sh&"
+  register: startup
+  changed_when: startup.stdout | search('Starting WebLogic Server')
